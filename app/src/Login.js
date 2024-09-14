@@ -16,7 +16,7 @@ const Login = () => {
     };
 
     return (
-        <div className="Login">
+        <div className="Login" style={{ textAlign: 'center', marginTop: '100px' }}>
             <h1>Login with Google</h1>
             <button onClick={handleLogin}>Login with Google</button>
         </div>
