@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { auth, db } from './firebaseConfig';
-import { collection, addDoc, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { collection, addDoc, query, where, getDocs, orderBy, deleteDoc, doc } from 'firebase/firestore';
 
 const Notes = () => {
     const [userName, setUserName] = useState('');
@@ -28,7 +28,7 @@ const Notes = () => {
         setPrevNotes(fetched);
     };
 
-    const handleKeyDown = async (e) => {
+    const addNote = async (e) => {
         if (e.key === 'Enter') {
             await addDoc(collection(db, 'notes'), {
                 uid: auth.currentUser.uid,
@@ -39,6 +39,11 @@ const Notes = () => {
             fetchPrevNotes()
             e.target.value = '';
         }
+    };
+
+    const deleteNote = async (id) => {
+        await deleteDoc(doc(db, 'notes', id));
+        fetchPrevNotes();
     };
 
     useEffect(() => {
@@ -61,7 +66,7 @@ const Notes = () => {
                     {prevNotes.map((note) => (
                         <li key={note.id} style={{ border: '1px solid', margin: '10px', padding: '10px', display: 'flex', justifyContent: 'space-between', }}>
                             {note.note}
-                            <button style={{ border: 'none', background: 'transparent', color: 'red', cursor: 'pointer' }}>
+                            <button onClick={() => deleteNote(note.id)} style={{ border: 'none', background: 'transparent', color: 'red', cursor: 'pointer' }}>
                                 X
                             </button>
                         </li>
@@ -71,7 +76,7 @@ const Notes = () => {
             <input
                 placeholder="Write New Note"
                 type="text"
-                onKeyDown={handleKeyDown}
+                onKeyDown={addNote}
             />
         </div>
     );
