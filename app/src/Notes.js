@@ -41,6 +41,17 @@ const Notes = () => {
         }
     };
 
+    useEffect(() => {
+        const authChange = auth.onAuthStateChanged((user) => {
+            if (user) {
+                setUserName(user.displayName);
+                fetchPrevNotes();
+            }
+        });
+
+        return () => authChange();
+    }, []);
+
     return (
         <div className="Notes" style={{ textAlign: 'center', marginTop: '100px' }}>
             <h1>Here are your notes, {userName}</h1>
