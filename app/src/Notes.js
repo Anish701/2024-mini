@@ -44,12 +44,15 @@ const Notes = () => {
     return (
         <div className="Notes" style={{ textAlign: 'center', marginTop: '100px' }}>
             <h1>Here are your notes, {userName}</h1>
-            <div style={{ textAlign: 'left', maxWidth: '20%', margin: '0 auto' }}>
+            <div style={{ textAlign: 'left', maxWidth: '15%', margin: '0 auto' }}>
                 <h2 style={{ textAlign: 'center' }}>Your Notes:</h2>
                 <ul style={{ listStyleType: 'none', padding: 0 }}>
                     {prevNotes.map((note) => (
-                        <li key={note.id} style={{ border: '1px solid', margin: '10px', padding: '10px' }}>
+                        <li key={note.id} style={{ border: '1px solid', margin: '10px', padding: '10px', display: 'flex', justifyContent: 'space-between', }}>
                             {note.note}
+                            <button style={{ border: 'none', background: 'transparent', color: 'red', cursor: 'pointer' }}>
+                                X
+                            </button>
                         </li>
                     ))}
                 </ul>
