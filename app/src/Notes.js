@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { auth, db } from './firebaseConfig';
 import { collection, addDoc, query, where, getDocs, orderBy, deleteDoc, doc } from 'firebase/firestore';
+import './styles.css'
 
 const Notes = () => {
     const [userName, setUserName] = useState('');
