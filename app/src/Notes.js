@@ -1,86 +1,80 @@
-import React, { useEffect, useState } from 'react';
-import { auth, db } from './firebaseConfig';
-import { collection, addDoc, query, where, getDocs, orderBy, deleteDoc, doc } from 'firebase/firestore';
-import './styles.css'
+import { useState, useEffect } from 'react';
+import { nanoid } from 'nanoid';
+import NotesList from './NotesList';
+import Search from './Search';
+import Header from './Header';
+import './noteformat'
+const Note = () => {
+	const [notes, setNotes] = useState([
+		{
+			id: nanoid(),
+			text: 'One',
+			date: '09/15/2024',
+		},
+		{
+			id: nanoid(),
+			text: 'Two',
+			date: '09/15/2024',
+		},
+		{
+			id: nanoid(),
+			text: 'Three',
+			date: '09/15/2024',
+		},
+	]);
 
-const Notes = () => {
-    const [userName, setUserName] = useState('');
-    const [newNote, setNewNote] = useState("");
-    const [prevNotes, setPrevNotes] = useState([]);
+	const [searchText, setSearchText] = useState('');
 
-    useEffect(() => {
-        if (auth.currentUser) {
-            setUserName(auth.currentUser.displayName);
-            fetchPrevNotes();
-        }
-    }, []);
+	const [darkMode, setDarkMode] = useState(false);
 
-    const fetchPrevNotes = async () => {
-        const q = query(
-            collection(db, 'notes'),
-            where('uid', '==', auth.currentUser.uid),
-            orderBy('createdAt', 'desc')
-        );
-        const qRes = await getDocs(q);
-        const fetched = qRes.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-        }));
-        setPrevNotes(fetched);
-    };
+	useEffect(() => {
+		const savedNotes = JSON.parse(
+			localStorage.getItem('react-notes-app-data')
+		);
 
-    const addNote = async (e) => {
-        if (e.key === 'Enter') {
-            await addDoc(collection(db, 'notes'), {
-                uid: auth.currentUser.uid,
-                note: e.target.value,
-                createdAt: new Date(),
-            });
-            setNewNote(e.target.value);
-            fetchPrevNotes()
-            e.target.value = '';
-        }
-    };
+		if (savedNotes) {
+			setNotes(savedNotes);
+		}
+	}, []);
 
-    const deleteNote = async (id) => {
-        await deleteDoc(doc(db, 'notes', id));
-        fetchPrevNotes();
-    };
+	useEffect(() => {
+		localStorage.setItem(
+			'react-notes-app-data',
+			JSON.stringify(notes)
+		);
+	}, [notes]);
 
-    useEffect(() => {
-        const authChange = auth.onAuthStateChanged((user) => {
-            if (user) {
-                setUserName(user.displayName);
-                fetchPrevNotes();
-            }
-        });
+	const add = (text) => {
+		const date = new Date();
+		const newNote = {
+			id: nanoid(),
+			text: text,
+			date: date.toLocaleDateString(),
+		};
+		const newNotes = [...notes, newNote];
+		setNotes(newNotes);
+	};
 
-        return () => authChange();
-    }, []);
+	const deleteNote = (id) => {
+		const newNotes = notes.filter((note) => note.id !== id);
+		setNotes(newNotes);
+	};
 
-    return (
-        <div className="Notes" style={{ textAlign: 'center', marginTop: '100px' }}>
-            <h1>Here are your notes, {userName}</h1>
-            <div style={{ textAlign: 'left', maxWidth: '15%', margin: '0 auto' }}>
-                <h2 style={{ textAlign: 'center' }}>Your Notes:</h2>
-                <ul style={{ listStyleType: 'none', padding: 0 }}>
-                    {prevNotes.map((note) => (
-                        <li key={note.id} style={{ border: '1px solid', margin: '10px', padding: '10px', display: 'flex', justifyContent: 'space-between', }}>
-                            {note.note}
-                            <button onClick={() => deleteNote(note.id)} style={{ border: 'none', background: 'transparent', color: 'red', cursor: 'pointer' }}>
-                                X
-                            </button>
-                        </li>
-                    ))}
-                </ul>
-            </div>
-            <input
-                placeholder="Write New Note"
-                type="text"
-                onKeyDown={addNote}
-            />
-        </div>
-    );
+	return (
+		<div className={`${darkMode && 'dark-mode'}`}>
+			<noteformat/>
+			<div className='container'>
+				<Header handleToggleDarkMode={setDarkMode} />
+				<Search handleSearchNote={setSearchText} />
+				<NotesList
+					notes={notes.filter((note) =>
+						note.text.toLowerCase().includes(searchText)
+					)}
+					handleAdd={add}
+					handleDeleteNote={deleteNote}
+				/>
+			</div>
+		</div>
+	);
 };
-
-export default Notes;
+	export default Note
