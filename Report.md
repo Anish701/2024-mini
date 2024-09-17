@@ -1,7 +1,7 @@
 # Exercise 1
 max_bright = 45000  
 
-min_bright = 25000  
+min_bright = 20000  
 
 based on my room with lights on vs. off during late afternoon (dim vs. bright)
 
