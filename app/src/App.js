@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './Login';
 import Note from './Notes';
-import './noteformat'
 import './styles.css'
 import './index.css'
 
